@@ -1,25 +1,47 @@
 const User = require('../models/User');
 const userService = require('../services/userService');
+const producer = require('../producers/kafkaProducer');
+const mongoose = require('mongoose');
+const redisClient = require('../config/redisConfig');
+require('dotenv').config();
 
-const getUsers = async (req, res) => {
-  try {
-    const users = await userService.getAllUsers();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// Maneja las solicitudes DELETE para eliminar un usuario
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
 
-const createUser = async (req, res) => {
   try {
-    const user = await userService.createUser(req.body);
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    const userExists = await User.exists({ _id: objectId });
+    if (!userExists) {
+      return res.status(404).json({ error: `Usuario con ID ${id} no encontrado` });
+    }
+
+    const message = JSON.stringify({ id });
+    const encryptedMessage = userService.encrypt(message);
+    producer.send([{ topic: process.env.KAFKA_TOPIC, messages: JSON.stringify(encryptedMessage) }], (err) => {
+      if (err) {
+        console.error('Error al enviar mensaje a Kafka:', err);
+        return res.status(500).json({ error: 'Error al enviar mensaje a Kafka' });
+      }
+    });
+
+    await User.findByIdAndDelete(objectId);
+
+    redisClient.del(id, (redisErr) => {
+      if (redisErr) {
+        console.error('Error al eliminar token de Redis:', redisErr);
+        return res.status(500).json({ error: 'Usuario eliminado pero hubo un error al limpiar el token de Redis' });
+      }
+      res.json({ message: 'Usuario y token eliminados correctamente' });
+    });
+
+  } catch (err) {
+    console.error('Error al eliminar el usuario:', err);
+    res.status(500).json({ error: 'Error interno al eliminar el usuario' });
   }
 };
 
 module.exports = {
-  getUsers,
-  createUser
+  deleteUser
 };

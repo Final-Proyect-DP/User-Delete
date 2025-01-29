@@ -6,6 +6,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const logger = require('./config/logger');
+const userCreatedConsumer = require('./consumers/userCreatedConsumer'); // Importar el consumidor
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -42,6 +43,10 @@ mongoose.connect(process.env.MONGODB_URI, {
   app.listen(port, () => {
     logger.info(`Servidor corriendo en http://localhost:${port}`);
   });
+
+  // Inicializar el consumidor
+  userCreatedConsumer.start();
+
 }).catch(err => {
   logger.error('Error al conectar a MongoDB', err);
 });
