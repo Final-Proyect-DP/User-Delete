@@ -36,8 +36,8 @@ app.use(express.json());
 app.use('/users', userRoutes);
 
 connectDB().then(() => {
-  app.listen(port, () => {
-    logger.info(`Servidor corriendo en http://localhost:${port}`);
+  app.listen(port, '0.0.0.0', () => {
+    logger.info(`Servidor corriendo en http://0.0.0.0:${port}`);
   });
 
   // Inicializar el consumidor
