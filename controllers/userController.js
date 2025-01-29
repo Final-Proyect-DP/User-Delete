@@ -17,13 +17,16 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ error: `Usuario con ID ${id} no encontrado` });
     }
 
+    const topic = process.env.KAFKA_TOPIC;
+    if (!topic) {
+      throw new Error('KAFKA_TOPIC no está definido en el archivo .env');
+    }
+
     const message = JSON.stringify({ id });
     const encryptedMessage = userService.encrypt(message);
-    producer.send([{ topic: process.env.KAFKA_TOPIC, messages: JSON.stringify(encryptedMessage) }], (err) => {
-      if (err) {
-        console.error('Error al enviar mensaje a Kafka:', err);
-        return res.status(500).json({ error: 'Error al enviar mensaje a Kafka' });
-      }
+    await producer.send({
+      topic,
+      messages: [{ value: JSON.stringify(encryptedMessage) }],
     });
 
     await User.findByIdAndDelete(objectId);
