@@ -1,15 +1,12 @@
-const kafka = require('kafka-node');
+const kafka = require('../config/kafkaConfig');
 
-const Producer = kafka.Producer;
-const client = new kafka.KafkaClient({ kafkaHost: process.env.KAFKA_HOST });
-const producer = new Producer(client);
+const producer = kafka.producer();
 
-producer.on('ready', () => {
+const run = async () => {
+  await producer.connect();
   console.log('Productor de Kafka listo');
-});
+};
 
-producer.on('error', (err) => {
-  console.error('Error en el productor de Kafka:', err);
-});
+run().catch(console.error);
 
 module.exports = producer;
