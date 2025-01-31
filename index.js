@@ -5,8 +5,9 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const logger = require('./config/logger');
-const userCreatedConsumer = require('./consumers/userCreatedConsumer'); // Importar el consumidor
 const connectDB = require('./config/dbConfig'); // Importar la configuración de la base de datos
+const authLoginConsumer = require('./consumers/authLoginConsumer'); // Importar el consumidor
+const userLogoutConsumer = require('./consumers/userLogoutConsumer'); // Importar el consumidor
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -40,8 +41,13 @@ connectDB().then(() => {
     logger.info(`Servidor corriendo en http://0.0.0.0:${port}`);
   });
 
-  // Inicializar el consumidor
-  //userCreatedConsumer.start();
+  authLoginConsumer.run().catch(err => {
+    logger.error('Error al iniciar authLoginConsumer:', err);
+  });
+
+  userLogoutConsumer.run().catch(err => {
+    logger.error('Error al iniciar userLogoutConsumer:', err);
+  });
 
 }).catch(err => {
   logger.error('Error al conectar a MongoDB', err);
