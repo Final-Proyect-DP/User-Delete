@@ -8,6 +8,7 @@ const logger = require('./config/logger');
 const connectDB = require('./config/dbConfig'); // Importar la configuración de la base de datos
 const authLoginConsumer = require('./consumers/authLoginConsumer'); // Importar el consumidor
 const userLogoutConsumer = require('./consumers/userLogoutConsumer'); // Importar el consumidor
+const userCreatedConsumer = require('./consumers/userCreatedConsumer'); // Importar el consumidor
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -31,8 +32,16 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
-app.use(cors());
+const corsOptions = {
+  origin: '*',  // Permite todos los orígenes
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use(cors(corsOptions)); // Agregar esta línea
 app.use(express.json());
 app.use('/users', userRoutes);
 
@@ -47,6 +56,10 @@ connectDB().then(() => {
 
   userLogoutConsumer.run().catch(err => {
     logger.error('Error al iniciar userLogoutConsumer:', err);
+  });
+
+  userCreatedConsumer.run().catch(err => {
+    logger.error('Error al iniciar userCreatedConsumer:', err);
   });
 
 }).catch(err => {

@@ -4,7 +4,7 @@ const userService = require('../services/userService');
 const User = require('../models/User');
 require('dotenv').config();
 
-const consumer = kafka.consumer({ groupId: 'delete-service-group' });
+const consumer = kafka.consumer({ groupId: 'created-service-delete-group' });
 
 const run = async () => {
   await consumer.connect();
