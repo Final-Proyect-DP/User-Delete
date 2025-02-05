@@ -1,7 +1,7 @@
 const redisClient = require('../config/redisConfig');
 const logger = require('../config/logger');
 
-const EXPIRATION_TIME = 3600; // 1 hora en segundos
+const EXPIRATION_TIME = 3600; // 1 hour in seconds
 
 const redisUtils = {
   async setToken(userId, token) {
@@ -16,9 +16,9 @@ const redisUtils = {
         });
       });
       
-      logger.info(`Token establecido para usuario ${userIdStr} con expiración de ${EXPIRATION_TIME} segundos`);
+      logger.info(`Token set for user ${userIdStr} with expiration of ${EXPIRATION_TIME} seconds`);
     } catch (error) {
-      logger.error('Error al establecer token en Redis:', error);
+      logger.error('Error setting token in Redis:', error);
       throw error;
     }
   },
@@ -33,7 +33,7 @@ const redisUtils = {
       });
       return token;
     } catch (error) {
-      logger.error('Error al obtener token de Redis:', error);
+      logger.error('Error getting token from Redis:', error);
       throw error;
     }
   },
@@ -41,11 +41,11 @@ const redisUtils = {
   async deleteToken(userId) {
     try {
       const result = await redisClient.del(userId);
-      const message = result ? 'Sesión cerrada exitosamente' : 'Sesión no encontrada';
-      logger.info(`${message} para usuario ${userId}`);
+      const message = result ? 'Session closed successfully' : 'Session not found';
+      logger.info(`${message} for user ${userId}`);
       return { success: true, message };
     } catch (error) {
-      logger.error('Error al eliminar token de Redis:', error);
+      logger.error('Error deleting token from Redis:', error);
       throw error;
     }
   }

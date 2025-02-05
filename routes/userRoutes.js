@@ -7,27 +7,27 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * @swagger
  * /users/{id}:
  *   delete:
- *     summary: Elimina un usuario por ID
+ *     summary: Delete a user by ID
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: ID del usuario a eliminar
+ *         description: User ID to delete
  *       - in: query
  *         name: token
  *         required: true
  *         schema:
  *           type: string
- *         description: Token de autenticación
+ *         description: Authentication token
  *     responses:
  *       200:
- *         description: Usuario eliminado
+ *         description: User deleted
  *       404:
- *         description: Usuario no encontrado
+ *         description: User not found
  *       401:
- *         description: Token no válido
+ *         description: Invalid token
  */
 router.delete('/:id', authMiddleware.verifyToken, userController.deleteUser);
 

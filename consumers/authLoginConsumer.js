@@ -18,19 +18,18 @@ const run = async () => {
         try {
           const encryptedMessage = JSON.parse(message.value.toString());
           const decryptedMessage = userService.decryptMessage(encryptedMessage);
-          logger.info('Mensaje descifrado:', decryptedMessage);
+          logger.info('Decrypted message:', decryptedMessage);
 
           const { userId, token } = decryptedMessage;
           if (!userId || !token) {
-            throw new Error('Mensaje no contiene userId o token');
+            throw new Error('Message does not contain userId or token');
           }
 
-          // Usar redisUtils.setToken en lugar de storeUserSession
           await redisUtils.setToken(userId, token);
-          logger.info(`Token almacenado en Redis para usuario ${userId}`);
+          logger.info(`Token stored in Redis for user ${userId}`);
 
         } catch (error) {
-          logger.error('Error procesando mensaje:', {
+          logger.error('Error processing message:', {
             error: error.message,
             stack: error.stack
           });
@@ -38,7 +37,7 @@ const run = async () => {
       },
     });
   } catch (error) {
-    logger.error('login Consumer: Error iniciando el consumidor:', error);
+    logger.error('Login Consumer: Error starting consumer:', error);
     throw error;
   }
 };

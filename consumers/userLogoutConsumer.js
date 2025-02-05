@@ -17,25 +17,25 @@ const run = async () => {
       eachMessage: async ({ topic, partition, message }) => {
         try {
           const encryptedMessage = JSON.parse(message.value.toString());
-          logger.info('Mensaje cifrado recibido:', encryptedMessage);
+          logger.info('Encrypted message received:', encryptedMessage);
           
           const decryptedMessage = userService.decryptMessage(encryptedMessage);
           
           if (!decryptedMessage || !decryptedMessage.userId) {
-            throw new Error('Mensaje descifrado inválido o userId no encontrado');
+            throw new Error('Invalid decrypted message or userId not found');
           }
           
-          logger.info(`Procesando cierre de sesión para usuario: ${decryptedMessage.userId}`);
+          logger.info(`Processing logout for user: ${decryptedMessage.userId}`);
           await redisUtils.deleteToken(decryptedMessage.userId);
-          logger.info(`Token eliminado exitosamente para usuario: ${decryptedMessage.userId}`);
+          logger.info(`Token successfully deleted for user: ${decryptedMessage.userId}`);
 
         } catch (error) {
-          logger.error('Error procesando mensaje de cierre de sesión:', error.message);
+          logger.error('Error processing logout message:', error.message);
         }
       },
     });
   } catch (error) {
-    logger.error('login Consumer: Error iniciando el consumidor:', error);
+    logger.error('Login Consumer: Error starting the consumer:', error);
     throw error;
   }
 };

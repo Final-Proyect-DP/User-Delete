@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const redisClient = require('../config/redisConfig');
 require('dotenv').config();
 
-// Maneja las solicitudes DELETE para eliminar un usuario
+// Handles DELETE requests to remove a user
 const deleteUser = async (req, res) => {
   const { id } = req.params;
 
@@ -14,12 +14,12 @@ const deleteUser = async (req, res) => {
 
     const userExists = await User.exists({ _id: objectId });
     if (!userExists) {
-      return res.status(404).json({ error: `Usuario con ID ${id} no encontrado` });
+      return res.status(404).json({ error: `User with ID ${id} not found` });
     }
 
     const topic = process.env.KAFKA_TOPIC;
     if (!topic) {
-      throw new Error('KAFKA_TOPIC no está definido en el archivo .env');
+      throw new Error('KAFKA_TOPIC is not defined in .env file');
     }
 
     const message = JSON.stringify({ id });
@@ -33,15 +33,15 @@ const deleteUser = async (req, res) => {
 
     redisClient.del(id, (redisErr) => {
       if (redisErr) {
-        console.error('Error al eliminar token de Redis:', redisErr);
-        return res.status(500).json({ error: 'Usuario eliminado pero hubo un error al limpiar el token de Redis' });
+        console.error('Error deleting token from Redis:', redisErr);
+        return res.status(500).json({ error: 'User deleted but there was an error clearing the Redis token' });
       }
-      res.json({ message: 'Usuario y token eliminados correctamente' });
+      res.json({ message: 'User and token successfully deleted' });
     });
 
   } catch (err) {
-    console.error('Error al eliminar el usuario:', err);
-    res.status(500).json({ error: 'Error interno al eliminar el usuario' });
+    console.error('Error deleting user:', err);
+    res.status(500).json({ error: 'Internal error deleting user' });
   }
 };
 

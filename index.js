@@ -8,7 +8,7 @@ const logger = require('./config/logger');
 const connectDB = require('./config/dbConfig'); // Importar la configuración de la base de datos
 const authLoginConsumer = require('./consumers/authLoginConsumer'); // Importar el consumidor
 const userLogoutConsumer = require('./consumers/userLogoutConsumer'); // Importar el consumidor
-const userCreatedConsumer = require('./consumers/userCreatedConsumer'); // Importar el consumidor
+const { run: runUserCreatedConsumer } = require('./consumers/userCreatedConsumer'); // Importar el consumidor
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -47,21 +47,21 @@ app.use('/users', userRoutes);
 
 connectDB().then(() => {
   app.listen(port, '0.0.0.0', () => {
-    logger.info(`Servidor corriendo en http://0.0.0.0:${port}`);
+    logger.info(`Server running at http://0.0.0.0:${port}`);
   });
 
   authLoginConsumer.run().catch(err => {
-    logger.error('Error al iniciar authLoginConsumer:', err);
+    logger.error('Error starting authLoginConsumer:', err);
   });
 
   userLogoutConsumer.run().catch(err => {
-    logger.error('Error al iniciar userLogoutConsumer:', err);
+    logger.error('Error starting userLogoutConsumer:', err);
   });
 
-  userCreatedConsumer.run().catch(err => {
-    logger.error('Error al iniciar userCreatedConsumer:', err);
+  runUserCreatedConsumer().catch(err => {
+    logger.error('Error starting userCreatedConsumer:', err);
   });
 
 }).catch(err => {
-  logger.error('Error al conectar a MongoDB', err);
+  logger.error('Error connecting to MongoDB:', err);
 });

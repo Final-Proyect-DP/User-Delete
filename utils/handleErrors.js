@@ -1,15 +1,15 @@
 const logger = require('../config/logger'); // Actualizar la ruta
 
 const handleErrors = (error, id = '') => {
-  logger.error(`Error en la operación ${id ? `para ID ${id}` : ''}:`, error);
+  logger.error(`Error in operation ${id ? `for ID ${id}` : ''}:`, error);
 
-  // Errores de JWT
+  // JWT Errors
   if (error.name === 'JsonWebTokenError') {
     return {
       status: 401,
       response: {
         success: false,
-        message: 'Token inválido'
+        message: 'Invalid token'
       }
     };
   }
@@ -19,13 +19,13 @@ const handleErrors = (error, id = '') => {
       status: 401,
       response: {
         success: false,
-        message: 'Token expirado'
+        message: 'Token expired'
       }
     };
   }
 
-  // Error de sesión
-  if (error.message === 'Sesión inválida o expirada') {
+  // Session Error
+  if (error.message === 'Invalid or expired session') {
     return {
       status: 401,
       response: {
@@ -35,23 +35,23 @@ const handleErrors = (error, id = '') => {
     };
   }
 
-  // Error de Redis
+  // Redis Error
   if (error.message.includes('Redis')) {
     return {
       status: 500,
       response: {
         success: false,
-        message: 'Error en el servicio de sesión'
+        message: 'Session service error'
       }
     };
   }
 
-  // Error por defecto (500 Internal Server Error)
+  // Default Error (500 Internal Server Error)
   return {
     status: 500,
     response: {
       success: false,
-      message: 'Error interno del servidor'
+      message: 'Internal server error'
     }
   };
 };
