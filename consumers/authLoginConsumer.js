@@ -4,7 +4,7 @@ const userService = require('../services/userService');
 const redisUtils = require('../utils/redisUtils');
 require('dotenv').config();
 
-const consumer = kafka.consumer({ groupId: 'logout-service-delete-group' });
+const consumer = kafka.consumer({ groupId: 'logouts-service-delete-group' });
 
 const run = async () => {
   try {
