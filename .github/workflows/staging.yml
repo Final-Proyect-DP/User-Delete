@@ -1,4 +1,4 @@
-name: Deploy Pull Request to Test Environment
+name: Deploy Pull Request to main Environment
 
 on:
   push:
