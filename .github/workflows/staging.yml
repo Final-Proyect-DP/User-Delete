@@ -21,6 +21,8 @@ jobs:
           PORT: ${{ secrets.PORT }}
           HOST: ${{ secrets.HOST }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           ENCRYPTION_IV: ${{ secrets.ENCRYPTION_IV }}
@@ -32,8 +34,10 @@ jobs:
           KAFKA_TOPIC_LOGIN: ${{ secrets.KAFKA_TOPIC_LOGIN }}
         run: |
           echo "PORT=${PORT}" > .env
-          echo "HOST=${HOST}" >> .env
           echo "MONGODB_URI=${MONGODB_URI}" >> .env
+          echo "HOST=${HOST}" >> .env
+          echo "REDIS_HOST=${REDIS_HOST}" >> .env
+          echo "REDIS_PORT=${REDIS_PORT}" >> .env
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
           echo "ENCRYPTION_KEY=${ENCRYPTION_KEY}" >> .env
           echo "ENCRYPTION_IV=${ENCRYPTION_IV}" >> .env
