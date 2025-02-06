@@ -55,7 +55,7 @@ const startConsumers = async () => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(port, host, () => {
+    app.listen(port, '0.0.0.0', () => {
       logger.info(`Server running at http://${host}:${port}`);
     });
     await startConsumers();
