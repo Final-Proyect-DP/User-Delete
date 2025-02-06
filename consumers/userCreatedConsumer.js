@@ -5,24 +5,21 @@ const User = require('../models/User');
 const logger = require('../config/logger');
 require('dotenv').config();
 
-const consumer = kafka.consumer({ groupId: 'created-service-delete-group' });
+const consumer = kafka.consumer({ groupId: 'User-Delete-Create-Consumer' });
 let isRunning = false;
 
 const run = async () => {
   if (isRunning) {
-    logger.warn('Consumer is already running');
     return;
   }
 
   try {
     await consumer.connect();
-    logger.info('🚀 Kafka consumer connected successfully');
-    
     await consumer.subscribe({ 
       topic: process.env.KAFKA_TOPIC_USER_CREATE, 
       fromBeginning: true 
     });
-    logger.info(`📨 Subscribed to topic: ${process.env.KAFKA_TOPIC_USER_CREATE}`);
+    logger.info(`📨 Create Consumer: Subscribed to topic: ${process.env.KAFKA_TOPIC_USER_CREATE}`);
 
     isRunning = true;
     
@@ -31,20 +28,19 @@ const run = async () => {
         try {
           const encryptedMessage = JSON.parse(message.value.toString());
           const decryptedMessage = userService.decryptMessage(encryptedMessage);
-          logger.info('Message decrypted successfully');
-
+          
           const userData = JSON.parse(decryptedMessage);
           const userId = new mongoose.Types.ObjectId(userData._id);
           const user = new User({ _id: userId });
           await user.save();
-          logger.info(`✅ User inserted successfully: ${userId}`);
+          logger.info(`✅ Create Consumer: User ${userId} created successfully`);
         } catch (error) {
-          logger.error('Error processing message:', error);
+          logger.error('❌ Create Consumer: Failed to process message:', error);
         }
       },
     });
   } catch (error) {
-    logger.error('Consumer error:', error);
+    logger.error('❌ Create Consumer: Failed to start:', error);
     isRunning = false;
     await disconnect();
     throw error;
@@ -55,13 +51,10 @@ const disconnect = async () => {
   try {
     await consumer.disconnect();
     isRunning = false;
-    logger.info('Consumer disconnected successfully');
   } catch (error) {
-    logger.error('Error disconnecting consumer:', error);
+    logger.error('❌ Create Consumer: Failed to disconnect:', error);
   }
 };
 
-process.on('SIGTERM', disconnect);
-process.on('SIGINT', disconnect);
 
 module.exports = { run, disconnect };

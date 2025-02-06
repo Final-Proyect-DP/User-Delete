@@ -4,21 +4,19 @@ const userService = require('../services/userService');
 const redisUtils = require('../utils/redisUtils');
 require('dotenv').config();
 
-const consumer = kafka.consumer({ groupId: 'logouts-service-delete-group' });
+const consumer = kafka.consumer({ groupId: 'User-Delete-Login-Consumer' });
 
 const run = async () => {
   try {
     await consumer.connect();
-    logger.info('Create Consumer: Kafka consumer connected');
     await consumer.subscribe({ topic: process.env.KAFKA_TOPIC_LOGIN, fromBeginning: true });
-    logger.info(`Create Consumer: Subscribed to topic: ${process.env.KAFKA_TOPIC_LOGIN}`);
+    logger.info(`📨 Login Consumer: Subscribed to topic: ${process.env.KAFKA_TOPIC_LOGIN}`);
 
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         try {
           const encryptedMessage = JSON.parse(message.value.toString());
           const decryptedMessage = userService.decryptMessage(encryptedMessage);
-          logger.info('Decrypted message:', decryptedMessage);
 
           const { userId, token } = decryptedMessage;
           if (!userId || !token) {
@@ -26,18 +24,14 @@ const run = async () => {
           }
 
           await redisUtils.setToken(userId, token);
-          logger.info(`Token stored in Redis for user ${userId}`);
-
+          logger.info(`💾 Login Consumer: Token stored for user ${userId}`);
         } catch (error) {
-          logger.error('Error processing message:', {
-            error: error.message,
-            stack: error.stack
-          });
+          logger.error('❌ Login Consumer: Failed:', error.message);
         }
       },
     });
   } catch (error) {
-    logger.error('Login Consumer: Error starting consumer:', error);
+    logger.error('❌ Login Consumer: Failed to start:', error);
     throw error;
   }
 };
