@@ -19,6 +19,7 @@ jobs:
       - name: delete .env file
         env:
           PORT: ${{ secrets.PORT }}
+          HOST: ${{ secrets.HOST }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
@@ -34,6 +35,7 @@ jobs:
         run: |
           echo "PORT=${PORT}" > .env
           echo "MONGODB_URI=${MONGODB_URI}" >> .env
+          echo "HOST=${HOST}" >> .env
           echo "REDIS_HOST=${REDIS_HOST}" >> .env
           echo "REDIS_PORT=${REDIS_PORT}" >> .env
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
@@ -79,7 +81,7 @@ jobs:
     strategy:
       matrix:
         ec2_instance: 
-          - ec2-54-173-151-221.compute-1.amazonaws.com
+          - ec2-54-163-24-134.compute-1.amazonaws.com
 
     steps:
       - name: Deploy Container

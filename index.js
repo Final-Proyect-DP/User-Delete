@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
-s
+
 const userRoutes = require('./routes/userRoutes');
 const logger = require('./config/logger');
 const connectDB = require('./config/dbConfig');
