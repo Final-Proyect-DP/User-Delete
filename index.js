@@ -18,7 +18,7 @@ const host = process.env.HOST || 'localhost';
 
 const corsOptions = {
   origin: '*',
-  methods: ['POST'],
+  methods: ['DELETE'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true,
   optionsSuccessStatus: 200
