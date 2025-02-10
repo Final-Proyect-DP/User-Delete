@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
@@ -19,7 +18,7 @@ const host = process.env.HOST || 'localhost';
 
 const corsOptions = {
   origin: '*',
-  methods: ['POST'],
+  methods: ['DELETE'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true,
   optionsSuccessStatus: 200
@@ -27,6 +26,7 @@ const corsOptions = {
 
 
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/users', userRoutes);
@@ -55,7 +55,7 @@ const startConsumers = async () => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(port, host, () => {
+    app.listen(port, '0.0.0.0', () => {
       logger.info(`Server running at http://${host}:${port}`);
     });
     await startConsumers();
