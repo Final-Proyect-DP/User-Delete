@@ -1,11 +1,13 @@
-name: Deploy to staging Environment
+name: Deploy Pull Request to main Environment
 
 on:
-  push:
-    branches: [staging]
+  pull_request:
+    types: [closed] 
+    branches: [main]
 
 jobs:
   build_docker_image:
+    if: github.event.pull_request.merged == true
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
 
@@ -19,14 +21,14 @@ jobs:
       - name: delete .env file
         env:
           PORT: ${{ secrets.PORT }}
-          HOST: ${{ secrets.HOST }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          REDIS_URL: ${{ secrets.REDIS_URL }}
+          HOST: ${{ secrets.HOST_PROD }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI_PROD }}
+          REDIS_URL: ${{ secrets.REDIS_URL_PROD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           ENCRYPTION_IV: ${{ secrets.ENCRYPTION_IV }}
           KAFKA_CLIENT_ID: ${{ secrets.KAFKA_CLIENT_ID }}
-          KAFKA_BROKER: ${{ secrets.KAFKA_BROKER }}
+          KAFKA_BROKER: ${{ secrets.KAFKA_BROKER_PROD }}
           KAFKA_TOPIC: ${{ secrets.KAFKA_TOPIC }}
           KAFKA_TOPIC_USER_CREATE: ${{ secrets.KAFKA_TOPIC_USER_CREATE }}
           KAFKA_TOPIC_LOGOUT: ${{ secrets.KAFKA_TOPIC_LOGOUT }}
@@ -61,14 +63,14 @@ jobs:
         with:
           images: byvoxel/user-delete
           tags: |
-            type=raw,value=staging
+            type=raw,value=production
           
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: byvoxel/user-delete:staging
+          tags: byvoxel/user-delete:production
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -87,18 +89,18 @@ jobs:
         with:
           host: ${{ matrix.ec2_instance }}
           username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY1 }}
+          key: ${{ secrets.EC2_SSH_KEY_PROD }}
           port: 22
           timeout: "120s"
           script: |
             set -e
-            echo "Deploying image: byvoxel/user-delete:staging"
+            echo "Deploying image: byvoxel/user-delete:production"
             sudo docker stop user-delete || true
             sudo docker rm user-delete || true
-            sudo docker pull byvoxel/user-delete:staging
+            sudo docker pull byvoxel/user-delete:production
             sudo docker run -d \
               --name user-delete \
               -p 3021:3021 \
               --restart unless-stopped \
-              byvoxel/user-delete:staging
+              byvoxel/user-delete:production
             sudo docker system prune -af --volumes || true
